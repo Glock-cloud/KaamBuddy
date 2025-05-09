@@ -1,0 +1,171 @@
+/* Notification Styles */
+.notification {
+    padding: 15px 20px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    position: relative;
+    transition: all 0.4s ease;
+    animation: slideIn 0.5s forwards, fadeOut 0.5s 4.5s forwards;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    max-height: 120px;
+}
+
+.notification.persistent {
+    animation: slideIn 0.5s forwards;
+}
+
+.notification-icon {
+    margin-right: 15px;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.notification-content {
+    flex-grow: 1;
+}
+
+.notification-title {
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.notification-message {
+    margin: 0;
+    font-size: 14px;
+}
+
+.notification-close {
+    cursor: pointer;
+    font-size: 20px;
+    opacity: 0.7;
+    transition: opacity 0.3s;
+    background: none;
+    border: none;
+    color: inherit;
+    padding: 5px;
+}
+
+.notification-close:hover {
+    opacity: 1;
+}
+
+.notification-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    background-color: rgba(255, 255, 255, 0.5);
+    width: 100%;
+    animation: progress 5s linear forwards;
+}
+
+/* Success notification */
+.notification-success {
+    background-color: #28a745;
+    color: white;
+}
+
+.notification-success .notification-icon {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+/* Error notification */
+.notification-error {
+    background-color: #dc3545;
+    color: white;
+}
+
+.notification-error .notification-icon {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+/* Info notification */
+.notification-info {
+    background-color: #17a2b8;
+    color: white;
+}
+
+.notification-info .notification-icon {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+/* Warning notification */
+.notification-warning {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+.notification-warning .notification-icon {
+    background-color: rgba(0, 0, 0, 0.1);
+    color: #212529;
+}
+
+/* Animations */
+@keyframes slideIn {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        max-height: 120px;
+        margin-bottom: 20px;
+        padding: 15px 20px;
+    }
+    to {
+        opacity: 0;
+        max-height: 0;
+        margin-bottom: 0;
+        padding: 0 20px;
+    }
+}
+
+@keyframes progress {
+    from {
+        width: 100%;
+    }
+    to {
+        width: 0%;
+    }
+}
+
+/* Notification container for fixed positioned notifications */
+.notification-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    width: 350px;
+    max-width: 90%;
+}
+
+.notification-container .notification {
+    margin-bottom: 10px;
+}
+
+/* For mobile responsiveness */
+@media (max-width: 576px) {
+    .notification-container {
+        width: calc(100% - 40px);
+        right: 20px;
+    }
+} 

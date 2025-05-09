@@ -16,7 +16,8 @@ INSERT INTO service_categories (name, icon, description) VALUES
 ('Cleaning', 'fa-broom', 'Home and office cleaning services'),
 ('Beauty', 'fa-cut', 'Haircuts, makeup, and styling services'),
 ('Tutoring', 'fa-book', 'Academic and skill-based tutoring'),
-('Cooking', 'fa-utensils', 'Home cooking and catering services');
+('Cooking', 'fa-utensils', 'Home cooking and catering services'),
+('Other', 'fa-screwdriver-wrench', 'Home cooking and catering services');
 
 -- Modify service_providers table to include location data
 ALTER TABLE service_providers

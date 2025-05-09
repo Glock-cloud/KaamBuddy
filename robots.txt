@@ -1,0 +1,17 @@
+# KaamBuddy Robots.txt
+User-agent: *
+Disallow: /includes/
+Disallow: /uploads/reviews/
+Disallow: /database/
+Disallow: /js/
+Disallow: /fix-*.php
+Disallow: /check-*.php
+Disallow: /debug_*.php
+Disallow: /delete-*.php
+Disallow: /logout.php
+
+Sitemap: https://kaambuddy.com/sitemap.xml
+
+User-agent: Googlebot
+Allow: /uploads/profiles/
+Allow: /uploads/work/ 

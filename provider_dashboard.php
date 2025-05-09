@@ -194,24 +194,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Provider Dashboard - KaamBuddy</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/notifications.css">
 </head>
 <body>
-    <header>
-        <div class="container">
-            <div class="logo">
-                <h1>काम<span>Buddy</span></h1>
-            </div>
-            <nav>
-                <ul>
-                    <li><a href="index.php">Home</a></li>
-                    <li><a href="search.php">Find Services</a></li>
-                    <li><a href="logout.php" class="btn-secondary">Logout</a></li>
-                </ul>
-            </nav>
-        </div>
-    </header>
+    <?php include_once 'includes/header.php'; ?>
 
     <section class="dashboard-section">
         <div class="container">
@@ -220,14 +208,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <p>Manage your service provider profile</p>
             </div>
             
+            <div id="notification-area"></div>
+            
+            <!-- Hidden for JS to pick up -->
             <?php if (!empty($success)): ?>
-                <div class="success-box">
+                <div class="success-box" style="display: none;">
                     <?php echo $success; ?>
                 </div>
             <?php endif; ?>
             
             <?php if (!empty($error)): ?>
-                <div class="error-box">
+                <div class="error-box" style="display: none;">
                     <?php echo $error; ?>
                 </div>
             <?php endif; ?>
@@ -516,5 +507,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         });
     </script>
+    <script src="js/notifications.js"></script>
 </body>
 </html> 

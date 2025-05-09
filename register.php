@@ -76,8 +76,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $passwordHash = password_hash($password, PASSWORD_DEFAULT);
             
             // Add service_description column if it doesn't exist
-            $conn->query("ALTER TABLE service_providers ADD COLUMN service_description TEXT NULL");
-            $conn->query("ALTER TABLE service_providers ADD COLUMN custom_category VARCHAR(100) NULL");
+            //$conn->query("ALTER TABLE service_providers ADD COLUMN service_description TEXT NULL");
+            //$conn->query("ALTER TABLE service_providers ADD COLUMN custom_category VARCHAR(100) NULL");
             
             // Insert provider data into database
             $query = "INSERT INTO service_providers (name, phone, whatsapp, email, password_hash, category_id, custom_category, address, latitude, longitude, profile_image_url, service_description, state, city, district, area, pincode, created_at) 
@@ -87,7 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 die("Prepare failed: " . $conn->error);
             }
             $stmt->bind_param(
-                "ssssisssddsssssss",
+                "sssssisddsssssss",
                 $name, $phone, $whatsapp, $email, $passwordHash, $final_category_id, $final_category_name, $address, $latitude, $longitude, $profileImageUrl, $service_description, $state, $city, $district, $area, $pincode
             );
             if ($stmt->execute()) {
@@ -130,25 +130,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register as Service Provider - KaamBuddy</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/notifications.css">
 </head>
 <body>
-    <header>
-        <div class="container">
-            <div class="logo">
-                <h1>काम<span>Buddy</span></h1>
-            </div>
-            <nav>
-                <ul>
-                    <li><a href="index.php">Home</a></li>
-                    <li><a href="search.php">Find Services</a></li>
-                    <li><a href="provider_login.php">Provider Login</a></li>
-                    <li><a href="register.php" class="btn-primary">Register as Provider</a></li>
-                </ul>
-            </nav>
-        </div>
-    </header>
+    <?php include_once 'includes/header.php'; ?>
 
     <section class="register-section">
         <div class="container">
@@ -166,8 +153,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <p>Create your profile and let customers find your services</p>
                     </div>
                     
+                    <div id="notification-area"></div>
+                    
                     <?php if (!empty($error)): ?>
-                        <div class="error-box">
+                        <div class="error-box" style="display: none;">
                             <?php echo $error; ?>
                         </div>
                     <?php endif; ?>
@@ -234,6 +223,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <label for="address">Full Address *</label>
                             <textarea id="address" name="address" required></textarea>
                         </div>
+                        <!-- Add hidden fields for latitude and longitude -->
+                        <input type="hidden" id="latitude" name="latitude">
+                        <input type="hidden" id="longitude" name="longitude">
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="state">State *</label>
@@ -340,6 +332,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <script src="js/script.js"></script>
     <script src="js/location.js"></script>
+    <script src="js/notifications.js"></script>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         const useLocationBtn = document.getElementById('use-location');

@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $token = createPasswordResetToken($provider['id']);
             
             // Create reset link
-            $resetLink = "http://" . $_SERVER['HTTP_HOST'] . "/kaamchaahiye/reset_password.php?id=" . $provider['id'] . "&token=" . $token;
+            $resetLink = "http://" . $_SERVER['HTTP_HOST'] . "/KaamBuddy/reset_password.php?id=" . $provider['id'] . "&token=" . $token;
             
             // Send password reset email
             if (sendPasswordResetEmail($email, $resetLink) || ($_SERVER['HTTP_HOST'] == 'localhost' || $_SERVER['HTTP_HOST'] == '127.0.0.1')) {
@@ -51,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Forgot Password - KaamBuddy</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -98,7 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <form action="forgot_password.php" method="POST">
                         <div class="form-group">
                             <label for="email">Email Address</label>
-                            <input type="email" id="email" name="email" required>
+                            <input type="email" id="email" name="email" value="<?php echo isset($_GET['prefill']) ? htmlspecialchars($_GET['prefill']) : ''; ?>" required>
                         </div>
                         
                         <div class="form-footer">

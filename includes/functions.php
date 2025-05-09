@@ -352,7 +352,7 @@ function updateProviderPassword($providerId, $newPassword) {
  * @return bool True on success, false on failure
  */
 function sendPasswordResetEmail($email, $resetLink) {
-    $subject = "Password Reset - KaamChaahiye";
+    $subject = "Password Reset - KaamBuddy";
     
     $message = "
     <html>
@@ -362,7 +362,7 @@ function sendPasswordResetEmail($email, $resetLink) {
     <body>
         <div style='font-family:Arial,sans-serif; max-width:600px; margin:0 auto; padding:20px; border:1px solid #ddd;'>
             <div style='text-align:center; margin-bottom:20px;'>
-                <h1 style='color:#4a6ee0;'>Kaam<span style='color:#ff6b6b;'>चाहिए</span></h1>
+                <h1 style='color:#4a6ee0;'>Kaam<span style='color:#ff6b6b;'>Buddy</span></h1>
             </div>
             <h2>Password Reset Request</h2>
             <p>You recently requested to reset your password. Click the button below to reset it:</p>
@@ -371,11 +371,11 @@ function sendPasswordResetEmail($email, $resetLink) {
                     Reset Password
                 </a>
             </p>
-            <p>This link will expire in 30 minutes.</p>
+            <p>This link will expire in 24 hours.</p>
             <p>If you did not request a password reset, please ignore this email.</p>
             <hr style='margin:20px 0; border:none; border-top:1px solid #ddd;'>
             <p style='font-size:small; color:#777; text-align:center;'>
-                &copy; " . date('Y') . " KaamChaahiye. All rights reserved.
+                &copy; " . date('Y') . " KaamBuddy. All rights reserved.
             </p>
         </div>
     </body>
@@ -385,7 +385,7 @@ function sendPasswordResetEmail($email, $resetLink) {
     // Set content-type header for sending HTML email
     $headers = "MIME-Version: 1.0" . "\r\n";
     $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
-    $headers .= "From: KaamChaahiye <noreply@kaamchaahiye.com>" . "\r\n";
+    $headers .= "From: KaamBuddy <noreply@kaambuddy.com>" . "\r\n";
     
     // Check if we're in development environment (localhost)
     if ($_SERVER['SERVER_NAME'] == 'localhost' || $_SERVER['SERVER_NAME'] == '127.0.0.1') {

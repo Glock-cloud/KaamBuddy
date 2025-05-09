@@ -51,6 +51,24 @@ if ($providerId > 0) {
         echo "</div>";
         */
         
+        // Ensure reviews table exists
+        $reviewsTableQuery = "SHOW TABLES LIKE 'reviews'";
+        $reviewsTableExists = $conn->query($reviewsTableQuery)->num_rows > 0;
+        
+        if (!$reviewsTableExists) {
+            // Create reviews table
+            $createReviewsTable = "CREATE TABLE IF NOT EXISTS reviews (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                provider_id INT NOT NULL,
+                rating INT NOT NULL,
+                comment TEXT,
+                review_image VARCHAR(255),
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (provider_id) REFERENCES service_providers(id) ON DELETE CASCADE
+            )";
+            $conn->query($createReviewsTable);
+        }
+        
         // Get reviews
         $reviewQuery = "SELECT * FROM reviews WHERE provider_id = $providerId ORDER BY created_at DESC";
         $reviewResult = $conn->query($reviewQuery);
@@ -112,25 +130,102 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_review'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $provider ? htmlspecialchars($provider['name']) : 'Provider Not Found'; ?> - KaamChaahiye</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <title><?php echo $provider ? htmlspecialchars($provider['name']) : 'Provider Not Found'; ?> - KaamBuddy</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
+    <!-- Add lightbox styles -->
+    <style>
+        .lightbox {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        
+        .lightbox.active {
+            display: flex;
+        }
+        
+        .lightbox-img {
+            max-width: 90%;
+            max-height: 80vh;
+            object-fit: contain;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        
+        .lightbox-nav {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 15px;
+        }
+        
+        .lightbox-nav button {
+            background-color: transparent;
+            color: white;
+            border: none;
+            font-size: 24px;
+            margin: 0 15px;
+            cursor: pointer;
+            padding: 5px 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .lightbox-nav button:hover {
+            color: var(--primary-color);
+        }
+        
+        .lightbox-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 30px;
+            color: white;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .gallery-item {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            margin-bottom: 15px;
+            background-color: #fff;
+        }
+        
+        .gallery-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .work-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .gallery-item img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            display: block;
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <div class="container">
-            <div class="logo">
-                <h1>काम<span>Buddy</span></h1>
-            </div>
-            <nav>
-                <ul>
-                    <li><a href="index.php">Home</a></li>
-                    <li><a href="search.php">Find Services</a></li>
-                    <li><a href="register.php" class="btn-primary">Register as Provider</a></li>
-                </ul>
-            </nav>
-        </div>
-    </header>
+    <?php include_once 'includes/header.php'; ?>
 
     <section class="provider-profile">
         <div class="container">
@@ -148,7 +243,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_review'])) {
                                 </div>
                                 <h2 class="profile-name"><?php echo htmlspecialchars($provider['name']); ?></h2>
                                 <div class="profile-location">
-                                    <i class="fas fa-map-marker-alt"></i> <?php echo htmlspecialchars($provider['location']); ?>
+                                    <i class="fas fa-map-marker-alt"></i> 
+                                    <?php 
+                                        $location_parts = [];
+                                        if (!empty($provider['area'])) $location_parts[] = htmlspecialchars($provider['area']);
+                                        if (!empty($provider['city'])) $location_parts[] = htmlspecialchars($provider['city']);
+                                        if (!empty($provider['state'])) $location_parts[] = htmlspecialchars($provider['state']);
+                                        
+                                        if (!empty($location_parts)) {
+                                            echo implode(', ', $location_parts);
+                                        } else {
+                                            echo htmlspecialchars($provider['address']);
+                                        }
+                                    ?>
                                 </div>
                                 
                                 <div class="profile-rating">
@@ -203,15 +310,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_review'])) {
                     <div class="profile-content">
                         <?php if (!empty($workImages)): ?>
                             <div class="profile-card">
-                                <div class="profile-section">
-                                    <h3>Work Gallery</h3>
-                                    <div class="work-gallery">
-                                        <?php foreach ($workImages as $image): ?>
-                                            <div class="gallery-item">
-                                                <img src="<?php echo htmlspecialchars($image); ?>" alt="Work Sample">
-                                            </div>
-                                        <?php endforeach; ?>
-                                    </div>
+                                <h3>Work gallery</h3>
+                                <div class="work-gallery">
+                                    <?php foreach ($workImages as $index => $image): ?>
+                                        <div class="gallery-item" onclick="openLightbox(<?php echo $index; ?>)">
+                                            <img src="<?php echo htmlspecialchars($image); ?>" alt="Work Sample">
+                                        </div>
+                                    <?php endforeach; ?>
                                 </div>
                             </div>
                         <?php endif; ?>
@@ -356,87 +461,140 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_review'])) {
         </div>
     </footer>
 
-    <script src="js/script.js"></script>
-    <style>
-        .review-success {
-            background-color: #e8f5e9;
-            border-left: 4px solid var(--success);
-            color: var(--success);
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
+    <!-- Lightbox for image gallery -->
+    <div class="lightbox" id="lightbox">
+        <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
+        <img src="" alt="Work Sample" class="lightbox-img" id="lightbox-img">
+        <div class="lightbox-nav">
+            <button onclick="prevImage()"><i class="fas fa-arrow-left"></i> Previous</button>
+            <button onclick="nextImage()">Next <i class="fas fa-arrow-right"></i></button>
+        </div>
+    </div>
+    
+    <script>
+        // Mobile menu toggle
+        document.addEventListener('DOMContentLoaded', () => {
+            const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+            const navMenu = document.getElementById('nav-menu');
+            
+            if (mobileMenuToggle && navMenu) {
+                mobileMenuToggle.addEventListener('click', () => {
+                    navMenu.classList.toggle('active');
+                    mobileMenuToggle.innerHTML = navMenu.classList.contains('active') ? 
+                        '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
+                });
+            }
+            
+            // Close menu when clicking outside
+            document.addEventListener('click', (e) => {
+                if (navMenu && navMenu.classList.contains('active') && 
+                    !e.target.closest('nav') && 
+                    !e.target.closest('.mobile-menu-btn')) {
+                    navMenu.classList.remove('active');
+                    if (mobileMenuToggle) {
+                        mobileMenuToggle.innerHTML = '<i class="fas fa-bars"></i>';
+                    }
+                }
+            });
+        });
+        
+        // Lightbox functionality
+        let currentImageIndex = 0;
+        const workImages = <?php echo json_encode($workImages); ?>;
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-img');
+        
+        function openLightbox(index) {
+            currentImageIndex = index;
+            lightboxImg.src = workImages[index];
+            lightbox.classList.add('active');
+            document.body.style.overflow = 'hidden'; // Prevent scrolling
         }
         
-        .review-success i {
-            font-size: 18px;
-            margin-right: 10px;
+        function closeLightbox() {
+            lightbox.classList.remove('active');
+            document.body.style.overflow = ''; // Restore scrolling
         }
         
-        .no-reviews {
-            text-align: center;
-            padding: 20px;
-            color: var(--gray);
+        function nextImage() {
+            currentImageIndex = (currentImageIndex + 1) % workImages.length;
+            lightboxImg.src = workImages[currentImageIndex];
         }
         
-        .error-message {
-            text-align: center;
-            padding: 50px 0;
+        function prevImage() {
+            currentImageIndex = (currentImageIndex - 1 + workImages.length) % workImages.length;
+            lightboxImg.src = workImages[currentImageIndex];
         }
         
-        .error-message h2 {
-            color: var(--danger);
-            margin-bottom: 15px;
-        }
+        // Close lightbox with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && lightbox.classList.contains('active')) {
+                closeLightbox();
+            } else if (e.key === 'ArrowRight' && lightbox.classList.contains('active')) {
+                nextImage();
+            } else if (e.key === 'ArrowLeft' && lightbox.classList.contains('active')) {
+                prevImage();
+            }
+        });
         
-        .lightbox {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.9);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
+        // Click outside image to close
+        lightbox.addEventListener('click', function(e) {
+            if (e.target === lightbox) {
+                closeLightbox();
+            }
+        });
         
-        .lightbox-content {
-            position: relative;
-            max-width: 90%;
-            max-height: 90%;
-        }
-        
-        .lightbox-content img {
-            max-width: 100%;
-            max-height: 90vh;
-            display: block;
-        }
-        
-        .close-btn {
-            position: absolute;
-            top: -40px;
-            right: -10px;
-            font-size: 30px;
-            color: white;
-            cursor: pointer;
-        }
-        
-        .rating-input i.hover {
-            color: #f1c40f;
-        }
-        
-        .contact-buttons a {
-            padding: 8px 16px;
-            font-size: 15px;
-            min-width: 100px;
-            max-width: 160px;
-        }
-        .contact-buttons a i {
-            font-size: 16px;
-        }
-    </style>
+        // Star rating functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const stars = document.querySelectorAll('.rating-input i');
+            const ratingInput = document.querySelector('input[name="rating"]');
+            
+            stars.forEach(star => {
+                star.addEventListener('mouseover', function() {
+                    const rating = parseInt(this.getAttribute('data-value'));
+                    highlightStars(rating);
+                });
+                
+                star.addEventListener('mouseout', function() {
+                    const currentRating = parseInt(ratingInput.value);
+                    highlightStars(currentRating);
+                });
+                
+                star.addEventListener('click', function() {
+                    const rating = parseInt(this.getAttribute('data-value'));
+                    ratingInput.value = rating;
+                    highlightStars(rating);
+                });
+            });
+            
+            function highlightStars(rating) {
+                stars.forEach(star => {
+                    const starValue = parseInt(star.getAttribute('data-value'));
+                    if (starValue <= rating) {
+                        star.className = 'fas fa-star';
+                    } else {
+                        star.className = 'far fa-star';
+                    }
+                });
+            }
+            
+            // Review image preview
+            const reviewImageInput = document.getElementById('review-image');
+            const reviewImagePreview = document.getElementById('review-image-preview');
+            
+            if (reviewImageInput && reviewImagePreview) {
+                reviewImageInput.addEventListener('change', function() {
+                    if (this.files && this.files[0]) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            reviewImagePreview.innerHTML = `<img src="${e.target.result}" alt="Review Image Preview">`;
+                            reviewImagePreview.style.display = 'block';
+                        };
+                        reader.readAsDataURL(this.files[0]);
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html> 

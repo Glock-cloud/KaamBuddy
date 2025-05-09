@@ -46,24 +46,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Provider Login - KaamBuddy</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/notifications.css">
 </head>
 <body>
-    <header>
-        <div class="container">
-            <div class="logo">
-                <h1>काम<span>Buddy</span></h1>
-            </div>
-            <nav>
-                <ul>
-                    <li><a href="index.php">Home</a></li>
-                    <li><a href="search.php">Find Services</a></li>
-                    <li><a href="register.php" class="btn-primary">Register as Provider</a></li>
-                </ul>
-            </nav>
-        </div>
-    </header>
+    <?php include_once 'includes/header.php'; ?>
 
     <section class="login-section">
         <div class="container">
@@ -73,8 +61,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <p>Access your service provider account</p>
                 </div>
                 
+                <div id="notification-area"></div>
+                
                 <?php if (!empty($error)): ?>
-                    <div class="error-box">
+                    <div class="error-box" style="display: none;">
                         <?php echo $error; ?>
                     </div>
                 <?php endif; ?>
@@ -141,5 +131,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </footer>
 
     <script src="js/script.js"></script>
+    <script src="js/notifications.js"></script>
 </body>
 </html> 
