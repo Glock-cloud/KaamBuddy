@@ -3,7 +3,7 @@
 $db_host = 'localhost';
 $db_user = 'root'; // Default XAMPP username
 $db_password = ''; // Default XAMPP password (empty)
-$db_name = 'kaamchaahiye';
+$db_name = 'kaambuddy';
 
 // Create connection
 $conn = new mysqli($db_host, $db_user, $db_password, $db_name);

@@ -82,16 +82,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Insert provider data into database
             $query = "INSERT INTO service_providers (name, phone, whatsapp, email, password_hash, category_id, custom_category, address, latitude, longitude, profile_image_url, service_description, state, city, district, area, pincode, created_at) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
-            $stmt = $conn->prepare($query);
-            if (!$stmt) {
-                die("Prepare failed: " . $conn->error);
-            }
-            $stmt->bind_param(
-                "sssssisddsssssss",
-                $name, $phone, $whatsapp, $email, $passwordHash, $final_category_id, $final_category_name, $address, $latitude, $longitude, $profileImageUrl, $service_description, $state, $city, $district, $area, $pincode
-            );
-            if ($stmt->execute()) {
-                $providerId = $conn->insert_id;
+  
+  $stmt = $conn->prepare($query);
+  if (!$stmt) {
+      die("Prepare failed: " . $conn->error);
+  }
+  
+  $stmt->bind_param(
+      "ssssissddssssssss",
+      $name, $phone, $whatsapp, $email, $passwordHash, $final_category_id, $final_category_name, $address, $latitude, $longitude, $profileImageUrl, $service_description, $state, $city, $district, $area, $pincode
+  );
+  
+  if ($stmt->execute()) {
+      $providerId = $conn->insert_id;
+      // success logic
+  } else {
+      // handle execution error
+      die("Execution failed: " . $stmt->error);
+  }
+  
                 
                 // Handle work images upload
                 if (isset($_FILES['work_images']) && !empty($_FILES['work_images']['name'][0])) {
@@ -122,7 +131,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
     }
-}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">

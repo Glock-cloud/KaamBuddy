@@ -55,26 +55,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $validToken) {
     <title>Reset Password - KaamBuddy</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
-    <style>
-        .debug-info {
-            background: #f8d7da;
-            padding: 15px;
-            margin: 15px 0;
-            border-radius: 5px;
-            color: #721c24;
-        }
-        .debug-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
-        .debug-table th, 
-        .debug-table td {
-            border: 1px solid #ddd;
-            padding: 5px;
-            text-align: left;
-        }
-    </style>
 </head>
 <body>
     <header>
@@ -94,86 +74,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $validToken) {
 
     <section class="reset-section">
         <div class="container">
-            <?php
-            // Debug information for local development
-            if (($validToken || !empty($error)) && ($_SERVER['HTTP_HOST'] == 'localhost' || $_SERVER['HTTP_HOST'] == '127.0.0.1')) {
-                // Check if provider exists
-                $providerQuery = "SELECT * FROM service_providers WHERE id = $providerId";
-                $providerResult = $conn->query($providerQuery);
-                $providerExists = ($providerResult && $providerResult->num_rows > 0);
-                
-                // Check token table
-                $tokenQuery = "SELECT * FROM password_resets WHERE provider_id = $providerId";
-                $tokenResult = $conn->query($tokenQuery);
-                $tokensFound = ($tokenResult) ? $tokenResult->num_rows : 'Error';
-                
-                // Check if the token exists but is expired
-                $expiredQuery = "SELECT * FROM password_resets WHERE provider_id = $providerId AND token = '$token'";
-                $expiredResult = $conn->query($expiredQuery);
-                $tokenExists = ($expiredResult && $expiredResult->num_rows > 0);
-                
-                $expiryTime = 'N/A';
-                $currentTime = date('Y-m-d H:i:s');
-                $isExpired = false;
-                
-                if ($tokenExists) {
-                    $tokenData = $expiredResult->fetch_assoc();
-                    $isExpired = strtotime($tokenData['expires_at']) < time();
-                    $expiryTime = $tokenData['expires_at'];
-                }
-                
-                echo '<div class="debug-info">';
-                echo '<strong>Debug Information (Development Mode Only):</strong><br>';
-                echo "Provider ID: $providerId<br>";
-                if (!empty($token)) echo "Token (partial): " . substr($token, 0, 10) . "...<br>";
-                echo "Provider exists: " . ($providerExists ? 'Yes' : 'No') . "<br>";
-                echo "Tokens found for this provider: $tokensFound<br>";
-                
-                if (!empty($token)) {
-                    echo "Exact token exists: " . ($tokenExists ? 'Yes' : 'No') . "<br>";
-                    
-                    if ($tokenExists) {
-                        echo "Token is expired: " . ($isExpired ? 'Yes' : 'No') . "<br>";
-                        echo "Expiry time: $expiryTime<br>";
-                        echo "Current time: $currentTime<br>";
-                    }
-                }
-                
-                // Show password_resets table structure
-                $tableStructureQuery = "DESCRIBE password_resets";
-                $tableStructureResult = $conn->query($tableStructureQuery);
-                
-                if ($tableStructureResult && $tableStructureResult->num_rows > 0) {
-                    echo "<br><strong>Table Structure:</strong><br>";
-                    echo "<table class='debug-table'>";
-                    echo "<tr><th>Field</th><th>Type</th><th>Null</th><th>Key</th><th>Default</th><th>Extra</th></tr>";
-                    
-                    while ($row = $tableStructureResult->fetch_assoc()) {
-                        echo "<tr>";
-                        foreach ($row as $value) {
-                            echo "<td>" . htmlspecialchars($value) . "</td>";
-                        }
-                        echo "</tr>";
-                    }
-                    echo "</table>";
-                }
-                
-                echo '</div>';
-            }
-            ?>
-            
             <?php if ($success): ?>
                 <div class="success-message">
                     <i class="fas fa-check-circle"></i>
                     <h2>Password Reset Successful</h2>
-                    <p>Your password has been updated successfully.</p>
+                    <p>Your password has been successfully reset.</p>
+                    <p>You can now log in with your new password.</p>
                     <a href="provider_login.php" class="btn-primary">Login Now</a>
                 </div>
             <?php elseif ($validToken): ?>
                 <div class="reset-form">
                     <div class="form-title">
-                        <h2>Reset Password</h2>
-                        <p>Enter your new password below</p>
+                        <h2>Reset Your Password</h2>
+                        <p>Please enter your new password below</p>
                     </div>
                     
                     <?php if (!empty($error)): ?>
@@ -229,10 +142,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $validToken) {
                 </div>
                 <div class="footer-contact">
                     <h3>Contact Us</h3>
-                    <p><i class="fas fa-envelope"></i>
-                    <a href="mailto:KaamBuddy.info@gmail.com?subject=Enquiry from KaamBuddy.info@gmail.com"> KaamBuddy.info@gmail.com</a>
-                    <p><i class="fas fa-phone"></i> 
-                    <a href="tel:+919019304426">+91 9019304426</a>
+                    <p><i class="fas fa-envelope"></i> <a href="mailto:info@kaambuddy.com">info@kaambuddy.com</a></p>
+                    <p><i class="fas fa-phone"></i> <a href="tel:+919019304426">+91 9019304426</a></p>
                     <div class="social-icons">
                         <a href="#"><i class="fab fa-facebook"></i></a>
                         <a href="#"><i class="fab fa-twitter"></i></a>
@@ -249,4 +160,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $validToken) {
 
     <script src="js/script.js"></script>
 </body>
-</html> 
+</html>

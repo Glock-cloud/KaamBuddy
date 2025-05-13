@@ -388,18 +388,20 @@ function sendPasswordResetEmail($email, $resetLink) {
     $headers .= "From: KaamBuddy <noreply@kaambuddy.com>" . "\r\n";
     
     // Check if we're in development environment (localhost)
+    // In the sendPasswordResetEmail function
     if ($_SERVER['SERVER_NAME'] == 'localhost' || $_SERVER['SERVER_NAME'] == '127.0.0.1') {
-        // In development mode - don't try to send email, just log it
-        error_log("DEVELOPMENT MODE: Would send password reset email to $email with link $resetLink");
-        
-        // For debugging, you can display the reset link directly
-        echo "<div style='background:#e8f5e9; padding:15px; margin:15px 0; border-radius:5px;'>";
-        echo "<strong>Development Mode:</strong> Email sending is disabled.<br>";
-        echo "<strong>Reset Link:</strong> <a href='$resetLink'>$resetLink</a><br>";
-        echo "<small>In production, this link would be emailed to: $email</small>";
-        echo "</div>";
-        
-        return true; // Pretend the email was sent successfully
+    // In development mode - don't try to send email, just log it
+    error_log("DEVELOPMENT MODE: Would send password reset email to $email with link $resetLink");
+    
+    // For debugging, display the reset link directly in the page body
+    global $debugMessage;
+    $debugMessage = "<div style='background:#e8f5e9; padding:15px; margin:15px 0; border-radius:5px;'>";
+    $debugMessage .= "<strong>Development Mode:</strong> Email sending is disabled.<br>";
+    $debugMessage .= "<strong>Reset Link:</strong> <a href='$resetLink'>$resetLink</a><br>";
+    $debugMessage .= "<small>In production, this link would be emailed to: $email</small>";
+    $debugMessage .= "</div>";
+    
+    return true; // Pretend the email was sent successfully
     }
     
     // In production, actually send the email
@@ -423,4 +425,4 @@ function ensureUploadDirectoriesExist() {
         }
     }
 }
-?> 
+?>

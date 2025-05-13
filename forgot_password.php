@@ -3,6 +3,7 @@ include_once 'includes/functions.php';
 
 $error = '';
 $success = false;
+$debugMessage = ''; // Initialize the debug message variable
 
 // Process form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -27,14 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (sendPasswordResetEmail($email, $resetLink) || ($_SERVER['HTTP_HOST'] == 'localhost' || $_SERVER['HTTP_HOST'] == '127.0.0.1')) {
                 $success = true;
                 
-                // In development environment, show the reset link directly
-                if ($_SERVER['HTTP_HOST'] == 'localhost' || $_SERVER['HTTP_HOST'] == '127.0.0.1') {
-                    $debugMessage = "<div style='background:#e8f5e9; padding:15px; margin-top:15px; border-radius:5px;'>";
-                    $debugMessage .= "<strong>Debug Information (Development Only):</strong><br>";
-                    $debugMessage .= "Email sending is bypassed in local environment.<br>";
-                    $debugMessage .= "<strong>Reset Link:</strong> <a href='$resetLink'>$resetLink</a>";
-                    $debugMessage .= "</div>";
-                }
+                // Debug message is handled in the functions.php file
             } else {
                 $error = "Failed to send password reset email. Please try again later.";
             }
@@ -79,7 +73,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <p>If an account with that email exists, a password reset link has been sent.</p>
                     <p>Please check your email and follow the instructions to reset your password.</p>
                     <p>The link will expire in 24 hours.</p>
-                    <?php if (isset($debugMessage)) echo $debugMessage; ?>
+                   
+                    <?php if (!empty($debugMessage)): ?>
+                        <?php echo $debugMessage; ?>
+                    <?php endif; ?>
+                   
                     <a href="provider_login.php" class="btn-primary">Return to Login</a>
                 </div>
             <?php else: ?>
@@ -152,4 +150,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <script src="js/script.js"></script>
 </body>
-</html> 
+</html>
